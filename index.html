@@ -6,12 +6,8 @@
   <title>Sistema de Solicitação Cartográfica</title>
   <link rel="stylesheet" href="style.css" />
 
-  <!-- Firebase (module) -->
+  <!-- Firebase (module) - PRECISA ser module -->
   <script type="module" src="firebase-config.js"></script>
-<script type="module" src="script.js"></script>
-
-  <!-- Seu app -->
-  <script defer src="script.js"></script>
 </head>
 
 <body>
@@ -503,5 +499,8 @@
   <footer class="app-footer">
     Versão: R01 • Sistema Desenvolvido Pelo Setor do Geoambiental • Fev/2026
   </footer>
+
+  <!-- ✅ Seu app (NÃO module, e só uma vez, no final) -->
+  <script src="script.js"></script>
 </body>
 </html>
