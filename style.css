@@ -804,4 +804,17 @@ select {
 select option {
   color: black;
   background: white;
+
+}
+
+/* Select fechado */
+select {
+  background-color: #0f1b2e; /* mesma cor do seu tema */
+  color: #ffffff;
+}
+
+/* Dropdown interno */
+select option {
+  background-color: #ffffff;
+  color: #000000;
 }
