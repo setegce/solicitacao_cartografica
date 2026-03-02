@@ -2,14 +2,14 @@
   "use strict";
 
   // ================= CONFIG =================
-  const CODIGO_GESTOR = "061098";
+  const CODIGO_GESTOR = "Setgestao@!970";
   const CODIGOS_TECNICOS = {
-    LAIS: "061098",
-    LAIZE: "061098",
-    VALESKA: "061098",
-    LIZABETH: "061098",
-    ISMAEL: "061098",
-    FERNANDO: "061098",
+    LAIS: "Seteg@!02",
+    LAIZE: "Seteg@!07",
+    VALESKA: "Seteg@!03",
+    LIZABETH: "Seteg@!04",
+    ISMAEL: "Seteg@!05",
+    FERNANDO: "Seteg@!06",
   };
 
   // ================= STATE =================
@@ -1723,4 +1723,5 @@
 
   window.filtrarSolicitacoes = filtrarSolicitacoes;
   window.filtrarMinhasSolicitacoes = filtrarMinhasSolicitacoes;
+
 })();
