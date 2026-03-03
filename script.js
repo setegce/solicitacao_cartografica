@@ -269,79 +269,33 @@
     );
   }
 
-  // ID atômico: counters/solicitacoesNextId
-  async function obterProximoIdAtomico() {
-    const fn = window.firebaseFunctions;
-    if (!fn?.ref || !fn?.runTransaction || !window.db) {
-      // fallback (não ideal)
-      const max = solicitacoes.length ? Math.max(...solicitacoes.map((s) => s.id)) : 0;
-      return max + 1;
-    }
+// ID atômico: counters/solicitacoesNextId
+async function obterProximoIdAtomico() {
+  const fn = window.firebaseFunctions;
 
-    const counterRef = fn.ref(window.db, "counters/solicitacoesNextId");
-    const result = await fn.runTransaction(counterRef, (current) => {
-      const n = Number(current);
-      if (!Number.isFinite(n) || n < 1) return 1;
-      return n + 1;
-    });
+  // sempre calcula o max atual (pra não sobrescrever se counter resetar)
+  const maxAtual = solicitacoes.length ? Math.max(...solicitacoes.map((s) => Number(s.id) || 0)) : 0;
 
-    return Number(result.snapshot.val());
+  if (!fn?.ref || !fn?.runTransaction || !window.db) {
+    // fallback local
+    return maxAtual + 1;
   }
 
-  function getSolicitacaoRef(id) {
-    if (!window.db || !window.firebaseFunctions?.ref) return null;
-    return window.firebaseFunctions.ref(window.db, `solicitacoes/${id}`);
-  }
+  const counterRef = fn.ref(window.db, "counters/solicitacoesNextId");
 
-  function atualizarSolicitacaoFirebase(id, patch) {
-    if (!firebaseReady) {
-      mostrarNotificacao("⚠️ Aguardando conexão com servidor...", "warning");
-      return;
+  const result = await fn.runTransaction(counterRef, (current) => {
+    const n = Number(current);
+
+    // Se counter está vazio, inválido, ou menor/igual ao que já existe -> corrige pro próximo seguro
+    if (!Number.isFinite(n) || n <= maxAtual) {
+      return maxAtual + 1;
     }
 
-    const r = getSolicitacaoRef(id);
-    if (!r || !window.firebaseFunctions?.update) {
-      console.error("❌ Firebase update indisponível. Verifique firebase-config.js");
-      mostrarNotificacao("❌ Erro de configuração do Firebase.", "error");
-      return;
-    }
+    return n + 1;
+  });
 
-    const payload = {
-      ...patch,
-      dataAtualizacao: new Date().toISOString(),
-    };
-
-    window.firebaseFunctions.update(r, payload).catch((err) => {
-      console.error("❌ update:", err);
-      mostrarNotificacao("❌ Falha ao atualizar solicitação.", "error");
-    });
-  }
-
-  function excluirSolicitacao(id) {
-    if (!acessoGestor) {
-      mostrarNotificacao("⚠️ Apenas gestor pode excluir.", "warning");
-      return;
-    }
-
-    const r = getSolicitacaoRef(id);
-    if (!r || !window.firebaseFunctions?.remove) {
-      console.error("❌ Firebase remove indisponível. Verifique firebase-config.js");
-      mostrarNotificacao("❌ Erro de configuração do Firebase.", "error");
-      return;
-    }
-
-    window.firebaseFunctions
-      .remove(r)
-      .then(() => {
-        fecharModalConfirmacao();
-        fecharModal();
-        mostrarNotificacao(`🗑️ Solicitação #${id} excluída.`, "success");
-      })
-      .catch((err) => {
-        console.error("❌ remove:", err);
-        mostrarNotificacao("❌ Falha ao excluir solicitação.", "error");
-      });
-  }
+  return Number(result.snapshot.val());
+}
 
   // ================= FORM / VALIDAÇÃO =================
   function toggleForm() {
@@ -1725,4 +1679,5 @@
   window.filtrarMinhasSolicitacoes = filtrarMinhasSolicitacoes;
 
 })();
+
 
